@@ -55,11 +55,13 @@ table {
 // 여기부터 내가 원하는 css 적용
 body{
   font-family: 'Source Sans Pro', sans-serif;
-  background-color: ${(props) => props.theme.bgColor};
-  color: ${(props) => props.theme.bgColor};
+  //Theme에 지정한 bgColor가져오기
+  background-color: ${(props) => props.theme.bgColor};  
+  color: ${(props) => props.theme.textColor};
 }
 a{
   text-decoration: none;
+  color: inherit; // a의 모든 color는 그의 부모에게서 가져와라
 }
 * {
   box-sizing: border-box;
