@@ -23,9 +23,10 @@ const Coin = styled.li`
   margin-bottom: 10px;
   border-radius: 15px;
   a {
+    display: flex;
+    align-items: center;
     padding: 20px;
     transition: color 0.2s ease-in; // Coin 영역의 a태그가 0.2만에 색깔이 변함
-    display: block; // a태그를 가지고 있는 블록을 전체 선택(포함)
   }
   &:hover {
     a {
@@ -44,6 +45,12 @@ const Loader = styled.span`
   font-size: 20px;
   color: white;
   display: block;
+`;
+
+const Img = styled.img`
+  width: 35px;
+  height: 35px;
+  margin-right: 10px;
 `;
 
 // Coin객체의 타입을 지정, typescript한테 알려줌
@@ -83,7 +90,12 @@ function Coins() {
         <CoinsList>
           {coins.map((coin) => (
             <Coin key={coin.id}>
-              <Link to={`/${coin.id}`}>{coin.name} &rarr;</Link>
+              <Link to={`/${coin.id}`} state={{ name: coin.name }}>
+                <Img
+                  src={`https://coinicons-api.vercel.app/api/icon/${coin.symbol.toLowerCase()}`}
+                />
+                {coin.name} &rarr;
+              </Link>
             </Coin>
           ))}
         </CoinsList>
