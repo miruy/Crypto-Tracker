@@ -1,6 +1,6 @@
 import { createGlobalStyle } from "styled-components";
-import { isPropertySignature } from "typescript";
 import Router from "./Router";
+import { ReactQueryDevtools } from "react-query/devtools"; // ReactQueryDevtools 추가
 
 // Reset : style의 기본값 제거 (사이트 전역에 내가 원하는 스타일 css를 지정하기 위함)
 const GlobalStyle = createGlobalStyle`
@@ -70,11 +70,13 @@ a{
 }
 `;
 
+// ReactQueryDevtools 추가
 function App() {
   return (
     <>
       <GlobalStyle />
       <Router />
+      <ReactQueryDevtools initialIsOpen={true} />
     </>
   );
 }
