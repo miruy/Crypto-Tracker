@@ -1,6 +1,9 @@
 import { useParams, useLocation } from "react-router";
+import { useMatch, Routes, Route, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import styled from "styled-components";
+import Price from "./Price";
+import Chart from "./Chart";
 
 const Container = styled.div`
   padding: 0px 20px;
@@ -27,8 +30,54 @@ const Loader = styled.span`
   display: block;
 `;
 
+const Overview = styled.div`
+  display: flex;
+  justify-content: space-between;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 10px 20px;
+  border-radius: 10px;
+`;
+const OverviewItem = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  span:first-child {
+    font-size: 10px;
+    font-weight: 400;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+  }
+`;
+const Description = styled.p`
+  margin: 20px 0px;
+`;
+
+const Tabs = styled.div`
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  margin: 25px 0px;
+  gap: 10px;
+`;
+
+const Tab = styled.span<{ isActive: boolean }>`
+  text-align: center;
+  text-transform: uppercase;
+  font-size: 12px;
+  font-weight: 400;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 7px 0px;
+  border-radius: 10px;
+  color: ${(props) =>
+    props.isActive ? props.theme.accentColor : props.theme.textColor};
+  a {
+    display: block;
+  }
+`;
+
 interface RouterState {
-  name: string;
+  state: {
+    name: string;
+  };
 }
 
 /* 
@@ -100,12 +149,13 @@ interface priceData {
 function Coin() {
   const { coinId } = useParams();
   const [loading, setLoading] = useState(true);
-  const [info, setInfo] = useState<infoData>({}); // API 캡슐화 호출한 정보
-  const [priceInfo, setPriceInfo] = useState<priceData>({}); // API 캡슐화 호출한 정보
+  const [info, setInfo] = useState<infoData>(); // API 캡슐화 호출한 정보
+  const [priceInfo, setPriceInfo] = useState<priceData>(); // API 캡슐화 호출한 정보
+  const priceMatch = useMatch("/:coinId/price"); // useMatch() : ()에 작성한 특정한 url에 있는지를 null / 데이터(not null) 형태로 알려줌
+  const chartMatch = useMatch("/:coinId/chart");
 
   // interface RouterState로부터 state 값을 바로 호출
-  const location = useLocation();
-  const name = location.state as RouterState;
+  const { state } = useLocation() as RouterState;
 
   // 코인 detail 페이지로 이동 시 코인 API는 한번만 실행될 수 있게 하고
   // 즉시 함수가 실행될 수 있도록 execute 함수 ()() 사용
@@ -126,15 +176,62 @@ function Coin() {
       // 위에 API 캡슐화 호출한 정보를 각 state에 set함
       setInfo(infoData);
       setPriceInfo(priceData);
+      setLoading(false);
     })();
-  }, []);
+  }, [coinId]);
 
   return (
     <Container>
       <Header>
-        <Title>{name?.name || "Loading..."}</Title>
+        <Title>
+          {state?.name ? state.name : loading ? "Loading..." : info?.name}
+        </Title>
       </Header>
-      {loading ? <Loader>Loading...</Loader> : null}
+      {loading ? (
+        <Loader>Loading...</Loader>
+      ) : (
+        <>
+          <Overview>
+            <OverviewItem>
+              <span>Rank:</span>
+              <span>{info?.rank}</span>
+            </OverviewItem>
+            <OverviewItem>
+              <span>Symbol:</span>
+              <span>${info?.symbol}</span>
+            </OverviewItem>
+            <OverviewItem>
+              <span>Open Source:</span>
+              <span>{info?.open_source ? "Yes" : "No"}</span>
+            </OverviewItem>
+          </Overview>
+          <Description>{info?.description}</Description>
+          <Overview>
+            <OverviewItem>
+              <span>Total Suply:</span>
+              <span>{priceInfo?.total_supply}</span>
+            </OverviewItem>
+            <OverviewItem>
+              <span>Max Supply:</span>
+              <span>{priceInfo?.max_supply}</span>
+            </OverviewItem>
+          </Overview>
+
+          <Tabs>
+            <Tab isActive={priceMatch !== null}>
+              <Link to={`/${coinId}/price`}>Price</Link>
+            </Tab>
+            <Tab isActive={chartMatch !== null}>
+              <Link to={`/${coinId}/chart`}>Chart</Link>
+            </Tab>
+          </Tabs>
+
+          <Routes>
+            <Route path="price" element={<Price />} />
+            <Route path="chart" element={<Chart />} />
+          </Routes>
+        </>
+      )}
     </Container>
   );
 }

@@ -54,10 +54,12 @@ table {
 }  
 // 여기부터 내가 원하는 css 적용
 body{
+  font-weight: 300;
   font-family: 'Source Sans Pro', sans-serif;
   //Theme에 지정한 bgColor가져오기
   background-color: ${(props) => props.theme.bgColor};  
   color: ${(props) => props.theme.textColor};
+  line-height: 1.2;
 }
 a{
   text-decoration: none;
